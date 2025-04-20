@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Dashboard</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .main-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 3rem;
+            flex: 1;
+        }
+        .dashboard-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+        .dashboard-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #0d6efd;
+        }
+        .btn {
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+        }
+        .footer {
+            background: #343a40;
+            color: white;
+            padding: 1.5rem 0;
+            margin-top: auto;
+            position: relative;
+            width: 100%;
+        }
+        .wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .content {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <span class="navbar-brand">
+                <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+            </span>
+            <div class="d-flex align-items-center">
+                <span class="navbar-text text-white me-3">
+                    <i class="fas fa-user me-1"></i>Welcome, <strong th:text="${username}">Admin</strong>
+                </span>
+                <a href="/profile" class="btn btn-outline-light me-2">
+                    <i class="fas fa-user me-1"></i>Profile
+                </a>
+                <a href="/login" class="btn btn-outline-light">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="container">
+            <div class="main-container">
+                <h3 class="text-center mb-4">
+                    <i class="fas fa-cogs me-2"></i>Admin Control Panel
+                </h3>
+
+                <div class="row justify-content-center g-4">
+                    <div class="col-md-4">
+                        <a href="/admin/users" class="text-decoration-none">
+                            <div class="dashboard-card">
+                                <i class="fas fa-users-cog"></i>
+                                <h4>Manage Users</h4>
+                                <p class="text-muted">View and manage all registered users</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="/admin/jobs" class="text-decoration-none">
+                            <div class="dashboard-card">
+                                <i class="fas fa-briefcase"></i>
+                                <h4>Manage Jobs</h4>
+                                <p class="text-muted">View and manage all posted jobs</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="mb-0">
+                <i class="fas fa-code me-1"></i>© 2025 Developed and Designed by Team
+                <br>Sarabjeet Singh, Jessica Narita Hattori, 
+                <br>Naina Bhanot, Raul Ernesto Francia
+            </p>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

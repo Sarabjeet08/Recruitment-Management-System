@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Available Jobs</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body { background: #f8f9fa; min-height: 100vh; display: flex; flex-direction: column; }
+        .navbar { box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .main-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 3rem;
+            flex: 1;
+        }
+        .job-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s;
+        }
+        .job-card:hover { transform: translateY(-2px); }
+        .job-title { color: #0d6efd; font-weight: 600; }
+        .job-company { color: #6c757d; font-size: 0.9em; }
+        .job-salary { color: #198754; font-weight: 500; }
+        .job-description { color: #495057; font-size: 0.95em; line-height: 1.5; }
+        .btn { border-radius: 6px; padding: 0.5rem 1rem; }
+        .search-box { position: relative; margin-bottom: 2rem; }
+        .search-box input {
+            padding-left: 2.5rem;
+            border-radius: 8px;
+        }
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        .footer {
+            background: #343a40;
+            color: white;
+            padding: 1.5rem 0;
+            margin-top: auto;
+            position: relative;
+            width: 100%;
+        }
+        .wrapper { min-height: 100vh; display: flex; flex-direction: column; }
+        .content { flex: 1; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <span class="navbar-brand">
+                <i class="fas fa-briefcase me-2"></i>Available Jobs
+            </span>
+            <div class="d-flex align-items-center">
+                <span class="navbar-text text-white me-3">
+                    <i class="fas fa-user me-1"></i>Welcome, <strong th:text="${username}">Applicant</strong>
+                </span>
+                <a href="/login" class="btn btn-outline-light">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="container">
+            <div class="main-container">
+                <!-- Job Search -->
+                <form method="get" action="/jobs/view" class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="keyword" class="form-control" placeholder="Search by title or company" />
+                </form>
+
+                <!-- Job Cards -->
+                <div class="row">
+                    <div class="col-md-6" th:each="job : ${jobs}">
+                        <div class="job-card">
+                            <h5 class="job-title mb-2" th:text="${job.title}">Title</h5>
+                            <p class="job-company mb-2" th:text="${job.company}">Company</p>
+                            <p class="job-salary mb-2">
+                                <i class="fas fa-dollar-sign me-1"></i>
+                                <span th:text="${job.salary}">Salary</span>
+                            </p>
+                            <p class="job-description mb-3" th:text="${job.description}">Description</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div th:if="${appliedJobMap.containsKey(job.id)}"
+                                     th:with="status=${appliedJobMap.get(job.id).status}">
+                                    <button th:if="${status == 'Pending' or status == 'Interview' or status == 'Hired'}"
+                                            class="btn btn-secondary" disabled>
+                                        <i class="fas fa-check me-1"></i>Applied
+                                    </button>
+                                    <form th:if="${status == 'Rejected'}"
+                                          th:action="@{/jobs/apply/{jobId}(jobId=${job.id})}" method="get" class="d-inline">
+                                        <button class="btn btn-warning" type="submit">
+                                            <i class="fas fa-redo me-1"></i>Re-Apply
+                                        </button>
+                                    </form>
+                                </div>
+                                <div th:unless="${appliedJobMap.containsKey(job.id)}">
+                                    <form th:action="@{/jobs/apply/{jobId}(jobId=${job.id})}" method="get" class="d-inline">
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="fas fa-paper-plane me-1"></i>Apply Now
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" th:if="${jobs.empty}">
+                        <div class="text-center py-5">
+                            <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No jobs available at the moment</h5>
+                            <p class="text-muted">Please check back later for new job postings</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="/dashboard/applicant" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="mb-0">
+                <i class="fas fa-code me-1"></i>© 2025 Developed and Designed by Team<br>
+                Sarabjeet Singh, Jessica Narita Hattori,<br>
+                Naina Bhanot, Raul Ernesto Francia
+            </p>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

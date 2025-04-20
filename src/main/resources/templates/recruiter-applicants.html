@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Applicants for Job (Recruiter View)</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .main-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 3rem;
+            flex: 1;
+        }
+        .table {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .table thead th {
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .btn {
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+        }
+        .footer {
+            background: #343a40;
+            color: white;
+            padding: 1.5rem 0;
+            margin-top: auto;
+            position: relative;
+            width: 100%;
+        }
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-interview { background: #cce5ff; color: #004085; }
+        .status-hired { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .applicant-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s;
+        }
+        .applicant-card:hover {
+            transform: translateY(-2px);
+        }
+        .applicant-name {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+        .applicant-email {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        .wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .content {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <span class="navbar-brand">
+                <i class="fas fa-users me-2"></i>Job Applicants
+            </span>
+            <div class="d-flex align-items-center">
+                <span class="navbar-text text-white me-3">
+                    <i class="fas fa-user me-1"></i>Welcome, <strong th:text="${username}">Recruiter</strong>
+                </span>
+                <a href="/login" class="btn btn-outline-light">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="container">
+            <div class="main-container">
+                <h3 class="text-center mb-4">
+                    <i class="fas fa-list me-2"></i>Applicants for <span th:text="${jobTitle}">Job Title</span>
+                </h3>
+
+                <div class="row">
+                    <div class="col-md-6" th:each="app : ${applications}">
+                        <div class="applicant-card">
+                            <h5 class="applicant-name mb-2" th:text="${app.user.name}">Name</h5>
+                            <p class="applicant-email mb-3" th:text="${app.user.email}">Email</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <a th:if="${app.user.resume != null}"
+                                       th:href="@{${app.user.resume}}"
+                                       class="btn btn-outline-info"
+                                       target="_blank">
+                                        <i class="fas fa-file-pdf me-1"></i>View Resume
+                                    </a>
+                                    <span th:if="${app.user.resume == null}" class="text-muted">
+                                        <i class="fas fa-times-circle me-1"></i>No resume
+                                    </span>
+                                </div>
+                                <span th:class="'status-badge status-' + ${#strings.toLowerCase(app.status)}" 
+                                      th:text="${app.status}">Status</span>
+                            </div>
+
+                            <form th:action="@{'/dashboard/recruiter/applications/update/' + ${app.id}}" method="post" class="d-flex gap-2">
+                                <input type="hidden" name="jobId" th:value="${app.job.id}" />
+                                <select name="status" class="form-select">
+                                    <option value="Pending" th:selected="${app.status == 'Pending'}">Pending</option>
+                                    <option value="Interview" th:selected="${app.status == 'Interview'}">Interview</option>
+                                    <option value="Hired" th:selected="${app.status == 'Hired'}">Hired</option>
+                                    <option value="Rejected" th:selected="${app.status == 'Rejected'}">Rejected</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Update
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-12" th:if="${#lists.isEmpty(applications)}">
+                        <div class="text-center py-5">
+                            <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No applicants for this job</h5>
+                            <p class="text-muted">Check back later for new applications</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="/dashboard/recruiter/jobs" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to My Jobs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="mb-0">
+                <i class="fas fa-code me-1"></i>© 2025 Developed and Designed by Team
+                <br>Sarabjeet Singh, Jessica Narita Hattori, 
+                <br>Naina Bhanot, Raul Ernesto Francia
+            </p>
+        </div>
+    </footer>
+</div>
+</body>
+</html>
