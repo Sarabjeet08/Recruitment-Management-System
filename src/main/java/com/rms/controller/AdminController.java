@@ -1,3 +1,10 @@
+// AdminController - Handles administrative operations
+// Demonstrates:
+// - Administrative access control
+// - CRUD operations for jobs and users
+// - Cascade deletion handling
+// - Role management
+// - Request mapping with path variables
 package com.rms.controller;
 
 import com.rms.model.JobEntity;
@@ -27,7 +34,7 @@ public class AdminController {
     @Autowired
     private AuthService authService;
 
-    // ✅ View all jobs (including deletion requests)
+    // View all jobs including deletion requests
     @GetMapping("/jobs")
     public String listAllJobs(Model model) {
         List<JobEntity> jobs = jobRepository.findAll();
@@ -35,7 +42,7 @@ public class AdminController {
         return "admin-jobs";
     }
 
-    // ✅ View all applicants for a specific job
+    // View applicants for a specific job
     @GetMapping("/jobs/applicants/{jobId}")
     public String viewApplicants(@PathVariable Long jobId, Model model) {
         List<ApplicationEntity> applications = applicationRepository.findByJobId(jobId);
@@ -43,10 +50,10 @@ public class AdminController {
         return "admin-job-applicants";
     }
 
-    // ✅ Confirm delete: Admin deletes job after recruiter requests
+    // Handle job deletion with cascade deletion of applications
     @GetMapping("/jobs/delete/{id}")
     public String deleteJob(@PathVariable Long id) {
-        // Delete applications first
+        // Delete applications first (cascade deletion)
         List<ApplicationEntity> apps = applicationRepository.findByJobId(id);
         applicationRepository.deleteAll(apps);
 
@@ -55,7 +62,7 @@ public class AdminController {
         return "redirect:/admin/jobs";
     }
 
-    // ✅ Cancel deletion request from recruiter
+    // Cancel job deletion request
     @GetMapping("/jobs/cancel-delete/{id}")
     public String cancelDeleteRequest(@PathVariable Long id) {
         JobEntity job = jobRepository.findById(id).orElse(null);
@@ -66,26 +73,26 @@ public class AdminController {
         return "redirect:/admin/jobs";
     }
 
-    // ✅ View all users (for role management)
+    // View all users for role management
     @GetMapping("/users")
     public String viewAllUsers(Model model) {
-        List<UserEntity> users = authService.getAllUsers(); // Make sure this method exists
+        List<UserEntity> users = authService.getAllUsers();
         model.addAttribute("users", users);
         return "admin-users";
     }
 
-    // ✅ Update role of a specific user
+    // Update user role
     @PostMapping("/users/update-role/{id}")
     public String updateUserRole(@PathVariable Long id, @RequestParam String role) {
         UserEntity user = authService.getUserById(id);
         if (user != null) {
             user.setRole(role);
-            authService.saveUser(user); // Save updated user
+            authService.saveUser(user);
         }
         return "redirect:/admin/users";
     }
 
-    // ✅ Delete a user
+    // Delete user
     @GetMapping("/users/delete/{id}")
     public String deleteUser(@PathVariable Long id) {
         authService.deleteUserById(id);

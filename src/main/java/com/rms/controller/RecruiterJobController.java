@@ -1,3 +1,10 @@
+// RecruiterJobController - Handles job posting and applicant management for recruiters
+// Demonstrates:
+// - Job CRUD operations
+// - Application status management
+// - Soft delete pattern
+// - Model attribute binding
+// - Path variable handling
 package com.rms.controller;
 
 import com.rms.model.JobEntity;
@@ -21,7 +28,7 @@ public class RecruiterJobController {
     @Autowired
     private ApplicationRepository applicationRepository;
 
-    // Show all jobs posted (filtering by recruiter can be added)
+    // View all jobs posted by the recruiter
     @GetMapping("/jobs")
     public String showRecruiterJobs(Model model) {
         List<JobEntity> myJobs = jobRepository.findAll();
@@ -37,29 +44,29 @@ public class RecruiterJobController {
         return "recruiter-applicants";
     }
 
-    // Request job deletion (admin must approve/delete)
+    // Request job deletion (requires admin approval)
     @PostMapping("/request-delete/{jobId}")
     public String requestDelete(@PathVariable Long jobId) {
         JobEntity job = jobRepository.findById(jobId).orElse(null);
         if (job != null) {
-            job.setDeletionRequested(true); // Ensure this boolean field exists in JobEntity
+            job.setDeletionRequested(true);
             jobRepository.save(job);
         }
         return "redirect:/dashboard/recruiter/jobs";
     }
 
-    // Show edit form for a job
+    // Display job edit form
     @GetMapping("/edit/{jobId}")
     public String showEditForm(@PathVariable Long jobId, Model model) {
         JobEntity job = jobRepository.findById(jobId).orElse(null);
         if (job != null) {
             model.addAttribute("job", job);
-            return "edit-job"; // Make sure edit-job.html exists
+            return "edit-job";
         }
         return "redirect:/dashboard/recruiter/jobs";
     }
 
-    // Process job update
+    // Update job details
     @PostMapping("/edit/{jobId}")
     public String updateJob(@PathVariable Long jobId, @ModelAttribute JobEntity updatedJob) {
         JobEntity job = jobRepository.findById(jobId).orElse(null);
@@ -72,16 +79,17 @@ public class RecruiterJobController {
         }
         return "redirect:/dashboard/recruiter/jobs";
     }
-    @PostMapping("/applications/update/{applicationId}")
-public String updateApplicationStatus(@PathVariable Long applicationId,
-                                      @RequestParam String status,
-                                      @RequestParam Long jobId) {
-    ApplicationEntity app = applicationRepository.findById(applicationId).orElse(null);
-    if (app != null) {
-        app.setStatus(status);
-        applicationRepository.save(app);
-    }
-    return "redirect:/dashboard/recruiter/applicants/" + jobId;
-}
 
+    // Update application status (e.g., Accept/Reject)
+    @PostMapping("/applications/update/{applicationId}")
+    public String updateApplicationStatus(@PathVariable Long applicationId,
+                                        @RequestParam String status,
+                                        @RequestParam Long jobId) {
+        ApplicationEntity app = applicationRepository.findById(applicationId).orElse(null);
+        if (app != null) {
+            app.setStatus(status);
+            applicationRepository.save(app);
+        }
+        return "redirect:/dashboard/recruiter/applicants/" + jobId;
+    }
 }

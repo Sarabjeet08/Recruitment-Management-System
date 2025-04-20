@@ -1,3 +1,9 @@
+// UserEntity class - JPA Entity representing a user in the system
+// Demonstrates:
+// - JPA Entity mapping (@Entity, @Table)
+// - Encapsulation (private fields with public getters/setters)
+// - JPA Identity generation (@Id, @GeneratedValue)
+// - Constructor overloading (default and parameterized constructors)
 package com.rms.model;
 
 import jakarta.persistence.*;
@@ -15,8 +21,10 @@ public class UserEntity {
     private String role;
     private String resume;
 
+    // Default constructor required by JPA
     public UserEntity() {}
 
+    // Parameterized constructor for object initialization
     public UserEntity(String name, String email, String password, String role, String resume) {
         this.name = name;
         this.email = email;
@@ -25,6 +33,7 @@ public class UserEntity {
         this.resume = resume;
     }
 
+    // Getters and Setters - Encapsulation principle
     public Long getId() { return id; }
     public String getName() { return name; }
     public String getEmail() { return email; }

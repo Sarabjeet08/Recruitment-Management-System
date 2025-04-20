@@ -1,3 +1,10 @@
+// ApplicationRepository - Data access layer for job applications
+// Demonstrates:
+// - Repository pattern with custom queries
+// - Spring Data JPA query methods
+// - Relationship-based queries
+// - Optional return type for null safety
+// - Composite key queries
 package com.rms.service;
 
 import com.rms.model.ApplicationEntity;
@@ -9,8 +16,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ApplicationRepository extends JpaRepository<ApplicationEntity, Long> {
-   List<ApplicationEntity> findByUser(UserEntity user);
-List<ApplicationEntity> findByJobId(Long jobId);
-Optional<ApplicationEntity> findByUserAndJob(UserEntity user, JobEntity job); // 👈 for reapply prevention
+    // Find all applications by user
+    List<ApplicationEntity> findByUser(UserEntity user);
 
+    // Find all applications for a specific job
+    List<ApplicationEntity> findByJobId(Long jobId);
+
+    // Find specific application by user and job (for duplicate prevention)
+    Optional<ApplicationEntity> findByUserAndJob(UserEntity user, JobEntity job);
 }
